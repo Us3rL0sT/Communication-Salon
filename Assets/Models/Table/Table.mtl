@@ -1,0 +1,33 @@
+newmtl blinn1SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Bench_color.png
+map_Ka Bench_ao.png
+bump Bench_nrm.png -bm 1.5
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks Bench_gloss.png
+newmtl blinn2SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Stool_color.png
+map_Ka Stool_ao.png
+bump Stool_nrm.png -bm 1
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks Stool_gloss.png
+newmtl blinn3SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Table_color.png
+map_Ka Table_ao.png
+bump Table_nrm.png -bm 1.5
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks Table_gloss.png

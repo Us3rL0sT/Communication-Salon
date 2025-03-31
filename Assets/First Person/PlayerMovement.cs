@@ -12,20 +12,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioSource footstepAudio;
     [SerializeField] private AudioClip walkSound;
     [SerializeField] private AudioClip runSound;
+    [SerializeField] private float crouchSpeed = 3.5f;
+    [SerializeField] private float crouchHeight = 1f;
+    [SerializeField] private float standingHeight = 2f;
+    [SerializeField] private float crouchTransitionSpeed = 5f;
 
     private CharacterController characterController;
     private Camera playerCamera;
-
     private Vector3 velocity;
     private Vector2 rotation;
     private Vector2 direction;
     private bool isMoving;
+    private bool isCrouching;
+    private float currentHeight;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
         playerCamera = GetComponentInChildren<Camera>();
         Cursor.lockState = CursorLockMode.Locked;
+        currentHeight = standingHeight;
     }
 
     private void Update()
@@ -44,15 +50,34 @@ public class PlayerController : MonoBehaviour
         rotation.x = Mathf.Clamp(rotation.x - mouseDelta.y, -90, 90);
         playerCamera.transform.localEulerAngles = rotation;
 
+        HandleCrouch();
         HandleFootsteps();
     }
 
     private void FixedUpdate()
     {
         float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        if (isCrouching)
+            speed = crouchSpeed;
+
         direction *= speed;
         Vector3 move = Quaternion.Euler(0, playerCamera.transform.eulerAngles.y, 0) * new Vector3(direction.x, 0, direction.y);
         velocity = new Vector3(move.x, velocity.y, move.z);
+    }
+
+    private void HandleCrouch()
+    {
+        if (Input.GetKey(KeyCode.X))
+        {
+            isCrouching = true;
+        }
+        else
+        {
+            isCrouching = false;
+        }
+
+        currentHeight = Mathf.Lerp(currentHeight, isCrouching ? crouchHeight : standingHeight, Time.deltaTime * crouchTransitionSpeed);
+        characterController.height = currentHeight;
     }
 
     private void HandleFootsteps()
