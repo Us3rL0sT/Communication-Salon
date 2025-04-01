@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 public class PickUpWeapon : MonoBehaviour
 {
     public GameObject playerCamera;
@@ -65,14 +66,30 @@ public class PickUpWeapon : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R) && inventory[currentSlot] != null)
         {
-            Debug.Log("Поворот предмета в слоте " + currentSlot);
+            var rotator = inventory[currentSlot].GetComponent<WeaponRotator>();
+            if (rotator == null)
+            {
+                rotator = inventory[currentSlot].AddComponent<WeaponRotator>(); // Добавляем, если нет
+            }
+
             float angle = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? 90f : 45f;
-            inventory[currentSlot].GetComponent<WeaponRotator>().StartRotation(angle);
+            rotator.StartRotation(angle);
         }
+
+
 
         if (Input.GetKeyDown(KeyCode.C)) CombineItems();
 
         if (Input.GetKeyDown(KeyCode.V)) ToggleZoom();
+
+        if (Input.GetKeyDown(KeyCode.Escape)) StopGame();
+
+        if (Input.GetKeyDown(KeyCode.Tab)) // Меняй на любую удобную кнопку
+        {
+            bool isCursorVisible = Cursor.visible;
+            Cursor.lockState = isCursorVisible ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isCursorVisible;
+        }
 
         if (isZooming) HandleZoom();
     }
@@ -308,5 +325,19 @@ public class PickUpWeapon : MonoBehaviour
         }
 
         Debug.Log("В инвентаре больше нет предметов");
+    }
+
+
+    public void StopGame()
+    {
+        Debug.Log("Кнопка 'Играть' нажата. Попытка загрузить GameScene...");
+        if (SceneManager.GetSceneByName("MainMenu") != null)
+        {
+            SceneManager.LoadScene("MainMenu"); // Запуск сцены игры
+        }
+        else
+        {
+            Debug.LogError("Сцена 'GameScene' не найдена! Добавьте её в Build Settings.");
+        }
     }
 }

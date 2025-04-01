@@ -17,6 +17,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float standingHeight = 2f;
     [SerializeField] private float crouchTransitionSpeed = 5f;
 
+    // Параметры покачивания головой
+    [SerializeField] private float walkBobbingSpeed = 14f;
+    [SerializeField] private float runBobbingSpeed = 18f;
+    [SerializeField] private float walkBobbingAmount = 0.05f;
+    [SerializeField] private float runBobbingAmount = 0.1f;
+    [SerializeField] private float crouchBobbingAmount = 0.025f;
+    [SerializeField] private float bobbingResetSpeed = 2f;
+
     private CharacterController characterController;
     private Camera playerCamera;
     private Vector3 velocity;
@@ -25,6 +33,8 @@ public class PlayerController : MonoBehaviour
     private bool isMoving;
     private bool isCrouching;
     private float currentHeight;
+    private float defaultCameraYPos;
+    private float timer = 0f;
 
     private void Start()
     {
@@ -32,6 +42,7 @@ public class PlayerController : MonoBehaviour
         playerCamera = GetComponentInChildren<Camera>();
         Cursor.lockState = CursorLockMode.Locked;
         currentHeight = standingHeight;
+        defaultCameraYPos = playerCamera.transform.localPosition.y;
     }
 
     private void Update()
@@ -52,6 +63,7 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch();
         HandleFootsteps();
+        HandleHeadBobbing();
     }
 
     private void FixedUpdate()
@@ -99,6 +111,44 @@ public class PlayerController : MonoBehaviour
                 isMoving = false;
                 footstepAudio.Stop();
             }
+        }
+    }
+
+    private void HandleHeadBobbing()
+    {
+        if (!characterController.isGrounded) return;
+
+        float waveslice = 0f;
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        if (Mathf.Abs(horizontal) == 0 && Mathf.Abs(vertical) == 0)
+        {
+            // Сброс покачивания, когда игрок не двигается
+            timer = 0f;
+            Vector3 cameraPos = playerCamera.transform.localPosition;
+            cameraPos.y = Mathf.Lerp(cameraPos.y, defaultCameraYPos, Time.deltaTime * bobbingResetSpeed);
+            playerCamera.transform.localPosition = cameraPos;
+        }
+        else
+        {
+            // Вычисление покачивания
+            float bobbingSpeed = isCrouching ? walkBobbingSpeed * 0.5f :
+                                Input.GetKey(KeyCode.LeftShift) ? runBobbingSpeed : walkBobbingSpeed;
+
+            timer += bobbingSpeed * Time.deltaTime;
+            waveslice = Mathf.Sin(timer);
+
+            float bobbingAmount = isCrouching ? crouchBobbingAmount :
+                                 Input.GetKey(KeyCode.LeftShift) ? runBobbingAmount : walkBobbingAmount;
+
+            float translateChange = waveslice * bobbingAmount;
+            float totalAxes = Mathf.Clamp(Mathf.Abs(horizontal) + Mathf.Abs(vertical), 0f, 1f);
+            translateChange = totalAxes * translateChange;
+
+            Vector3 cameraPos = playerCamera.transform.localPosition;
+            cameraPos.y = defaultCameraYPos + translateChange;
+            playerCamera.transform.localPosition = cameraPos;
         }
     }
 }

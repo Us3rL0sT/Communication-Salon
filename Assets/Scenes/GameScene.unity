@@ -3525,7 +3525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateSpeed: 200
-  walkSpeed: 7
+  walkSpeed: 6
   runSpeed: 10
   jumpForce: 4
   gravity: -9.81
@@ -3536,6 +3536,12 @@ MonoBehaviour:
   crouchHeight: 1
   standingHeight: 2
   crouchTransitionSpeed: 5
+  walkBobbingSpeed: 5
+  runBobbingSpeed: 18
+  walkBobbingAmount: 0.05
+  runBobbingAmount: 0.1
+  crouchBobbingAmount: 0.025
+  bobbingResetSpeed: 2
 --- !u!143 &1268086270
 CharacterController:
   m_ObjectHideFlags: 0
