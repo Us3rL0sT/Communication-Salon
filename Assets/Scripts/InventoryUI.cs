@@ -5,15 +5,34 @@ public class InventoryUI : MonoBehaviour
 {
     [SerializeField] private Button[] inventorySlots;
 
+    void Start()
+    {
+        // При старте очищаем все слоты
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            ClearSlot(i);
+        }
+    }
+
     public void AddItem(Sprite itemSprite, int slotIndex)
     {
-        if (slotIndex < 0 || slotIndex >= inventorySlots.Length) return;
+        Debug.Log($"Попытка добавить предмет в слот {slotIndex}");
+
+        if (slotIndex < 0 || slotIndex >= inventorySlots.Length)
+        {
+            Debug.LogError($"Неверный индекс слота: {slotIndex}");
+            return;
+        }
+
         inventorySlots[slotIndex].image.sprite = itemSprite;
         inventorySlots[slotIndex].image.enabled = true;
+        Debug.Log($"Предмет добавлен в слот {slotIndex}");
     }
 
     public void ClearSlot(int slotIndex)
     {
+        Debug.Log($"Очищаем слот {slotIndex}");
+
         if (slotIndex < 0 || slotIndex >= inventorySlots.Length) return;
         inventorySlots[slotIndex].image.sprite = null;
         inventorySlots[slotIndex].image.enabled = false;
@@ -23,18 +42,18 @@ public class InventoryUI : MonoBehaviour
     {
         for (int i = 0; i < inventorySlots.Length; i++)
         {
-            if (inventorySlots[i].image.sprite == null)
+            // Слот свободен, если в нем нет спрайта ИЛИ он отключен
+            if (!inventorySlots[i].image.enabled || inventorySlots[i].image.sprite == null)
                 return i;
         }
         return -1;
     }
-    // Возвращает размер инвентаря
+
     public int GetInventorySize()
     {
         return inventorySlots.Length;
     }
 
-    // Возвращает спрайт в указанном слоте
     public Sprite GetItemSprite(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= inventorySlots.Length) return null;
